@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:imperios/modules/splash/splash_page.dart';
-import 'modules/home/home_page.dart';
+import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
-import 'modules/auth/login_page.dart';
+import 'modules/splash/splash_page.dart';
+import 'modules/cart/cart_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,14 +13,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Hamburgueria',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.red,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartController()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Burger Bros',
+        theme: AppTheme.lightTheme,
+        home: const SplashPage(),
       ),
-      home: const SplashPage(),
     );
   }
 }
