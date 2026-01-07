@@ -17,7 +17,8 @@ class _ProductCardState extends State<ProductCard> {
   bool pressed = false;
 
   void _onTap(BuildContext context) {
-    context.read<CartController>().addProduct(widget.product);
+   context.read<CartController>().add(widget.product);
+
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

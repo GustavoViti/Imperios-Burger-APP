@@ -1,31 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'models/cart_item_model.dart';
-import '../home/models/product_model.dart';
+import 'package:imperios/modules/cart/models/cart_item_model.dart';
+import 'package:imperios/modules/home/models/product_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class CartController extends ChangeNotifier {
-  final List<CartItemModel> _items = [];
+  final List<CartItem> _items = [];
 
-  List<CartItemModel> get items => _items;
+  List<CartItem> get items => _items;
+  bool get isEmpty => _items.isEmpty;
 
-  void addProduct(ProductModel product) {
+  double get total => _items.fold(
+        0,
+        (sum, item) => sum + item.product.price * item.quantity,
+      );
+
+  CartController() {
+    loadCart();
+  }
+
+  void add(ProductModel product) {
     final index =
         _items.indexWhere((item) => item.product.id == product.id);
 
     if (index >= 0) {
       _items[index].quantity++;
     } else {
-      _items.add(CartItemModel(product: product));
+      _items.add(CartItem(product: product));
     }
-    notifyListeners();
-  }
 
-  void removeProduct(ProductModel product) {
-    _items.removeWhere((item) => item.product.id == product.id);
+    saveCart();
     notifyListeners();
   }
 
   void increment(ProductModel product) {
-    addProduct(product);
+    add(product);
   }
 
   void decrement(ProductModel product) {
@@ -38,12 +48,36 @@ class CartController extends ChangeNotifier {
       } else {
         _items.removeAt(index);
       }
+      saveCart();
       notifyListeners();
     }
   }
 
-  double get total =>
-      _items.fold(0, (sum, item) => sum + item.total);
+  void clear() {
+    _items.clear();
+    saveCart();
+    notifyListeners();
+  }
 
-  bool get isEmpty => _items.isEmpty;
+  // 💾 SALVAR
+  Future<void> saveCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonCart = jsonEncode(_items.map((e) => e.toMap()).toList());
+    await prefs.setString('cart_items', jsonCart);
+  }
+
+  // 📦 RECUPERAR
+  Future<void> loadCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('cart_items');
+
+    if (data != null) {
+      final List decoded = jsonDecode(data);
+      _items.clear();
+      _items.addAll(
+        decoded.map((e) => CartItem.fromMap(e)).toList(),
+      );
+      notifyListeners();
+    }
+  }
 }

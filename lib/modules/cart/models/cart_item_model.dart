@@ -1,13 +1,26 @@
-import '../../home/models/product_model.dart';
+import 'package:imperios/modules/home/models/product_model.dart';
 
-class CartItemModel {
+
+class CartItem {
   final ProductModel product;
   int quantity;
 
-  CartItemModel({
+  CartItem({
     required this.product,
     this.quantity = 1,
   });
 
-  double get total => product.price * quantity;
+  Map<String, dynamic> toMap() {
+    return {
+      'product': product.toMap(),
+      'quantity': quantity,
+    };
+  }
+
+  factory CartItem.fromMap(Map<String, dynamic> map) {
+    return CartItem(
+      product: ProductModel.fromMap(map['product']),
+      quantity: map['quantity'],
+    );
+  }
 }
