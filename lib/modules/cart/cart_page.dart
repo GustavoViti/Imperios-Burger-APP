@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imperios/features/checkout/checkout_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'cart_controller.dart';
 import '../../core/theme/app_theme.dart';
@@ -89,26 +90,22 @@ class CartPage extends StatelessWidget {
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 14,
-                            ),
+                            minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CheckoutPage(),
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                               ),
+                              builder: (_) => const CheckoutBottomSheet(),
                             );
                           },
-                          child: const Text(
-                            'Finalizar',
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          child: const Text('Finalizar pedido'),
                         ),
                       ],
                     ),
