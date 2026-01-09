@@ -75,6 +75,7 @@ class CheckoutBottomSheet extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
+              foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
