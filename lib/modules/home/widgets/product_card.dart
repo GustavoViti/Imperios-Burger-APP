@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:imperios/core/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+
+import '../../../core/theme/app_theme.dart';
 import '../../cart/cart_controller.dart';
 import '../models/product_model.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductModel product;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({
+    super.key,
+    required this.product,
+  });
 
   @override
   State<ProductCard> createState() => _ProductCardState();
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool pressed = false;
+  bool _pressed = false;
 
-  void _onTap(BuildContext context) {
+  void _addToCart(BuildContext context) {
     context.read<CartController>().add(widget.product);
 
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${widget.product.name} adicionado ao carrinho 🛒'),
-        duration: const Duration(milliseconds: 800),
+        duration: const Duration(milliseconds: 900),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
       ),
@@ -39,7 +44,7 @@ class _ProductCardState extends State<ProductCard> {
         opacity: 1,
         duration: const Duration(milliseconds: 300),
         child: AnimatedScale(
-          scale: pressed ? 0.96 : 1,
+          scale: _pressed ? 0.96 : 1,
           duration: const Duration(milliseconds: 120),
           curve: Curves.easeOut,
           child: Padding(
@@ -51,14 +56,15 @@ class _ProductCardState extends State<ProductCard> {
               shadowColor: Colors.black.withOpacity(0.15),
               child: InkWell(
                 borderRadius: BorderRadius.circular(22),
-                onTapDown: (_) => setState(() => pressed = true),
-                onTapCancel: () => setState(() => pressed = false),
+                onTapDown: (_) => setState(() => _pressed = true),
+                onTapCancel: () => setState(() => _pressed = false),
                 onTap: () {
-                  setState(() => pressed = false);
-                  _onTap(context);
+                  setState(() => _pressed = false);
+                  _addToCart(context);
                 },
                 child: Row(
                   children: [
+                    /// IMAGEM
                     Hero(
                       tag: 'product-${widget.product.id}',
                       child: ClipRRect(
@@ -70,8 +76,8 @@ class _ProductCardState extends State<ProductCard> {
                           width: 120,
                           height: 120,
                           fit: BoxFit.cover,
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
                             return Container(
                               width: 120,
                               height: 120,
@@ -81,9 +87,20 @@ class _ProductCardState extends State<ProductCard> {
                               ),
                             );
                           },
+                          errorBuilder: (_, __, ___) => Container(
+                            width: 120,
+                            height: 120,
+                            color: Colors.grey.shade200,
+                            child: const Icon(
+                              Icons.image_not_supported_outlined,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ),
                       ),
                     ),
+
+                    /// CONTEÚDO
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(14),
@@ -112,10 +129,12 @@ class _ProductCardState extends State<ProductCard> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 250),
+                                  duration:
+                                      const Duration(milliseconds: 250),
                                   child: Text(
                                     'R\$ ${widget.product.price.toStringAsFixed(2)}',
-                                    key: ValueKey(widget.product.price),
+                                    key:
+                                        ValueKey(widget.product.price),
                                     style: const TextStyle(
                                       color: Colors.red,
                                       fontWeight: FontWeight.bold,
@@ -124,10 +143,11 @@ class _ProductCardState extends State<ProductCard> {
                                   ),
                                 ),
                                 AnimatedContainer(
-                                  duration: const Duration(milliseconds: 150),
+                                  duration:
+                                      const Duration(milliseconds: 150),
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: pressed
+                                    color: _pressed
                                         ? AppTheme.primary.withOpacity(0.2)
                                         : AppTheme.primary.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(12),

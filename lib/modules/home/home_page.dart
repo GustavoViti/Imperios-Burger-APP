@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:imperios/core/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/theme/app_theme.dart';
+import '../cart/cart_controller.dart';
+import '../cart/cart_page.dart';
 import 'models/product_model.dart';
 import 'widgets/banner_widget.dart';
 import 'widgets/category_widget.dart';
 import 'widgets/product_card.dart';
-import 'package:provider/provider.dart';
-import '../cart/cart_controller.dart';
-import '../cart/cart_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,14 +31,14 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          backgroundColor: const Color(0xFFF7F7F7),
-          body: CustomScrollView(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F7),
+      body: Stack(
+        children: [
+          CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              _sliverAppBar(context),
+              _buildAppBar(context),
               const SliverToBoxAdapter(child: BannerWidget()),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               const SliverToBoxAdapter(child: CategoryWidget()),
@@ -53,19 +54,19 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              _productsList(),
+              _buildProductsList(),
               const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
           ),
-        ),
-        _cartBottomBar(),
-      ],
+          _buildCartBottomBar(context),
+        ],
+      ),
     );
   }
 
-  // ---------------- APP BAR ----------------
+  // ================= APP BAR =================
 
-  SliverAppBar _sliverAppBar(BuildContext context) {
+  SliverAppBar _buildAppBar(BuildContext context) {
     return SliverAppBar(
       expandedHeight: 120,
       pinned: true,
@@ -127,19 +128,22 @@ class HomePage extends StatelessWidget {
                 child: Consumer<CartController>(
                   builder: (_, cart, __) {
                     if (cart.items.isEmpty) return const SizedBox();
-                    return AnimatedContainer(
+                    return AnimatedScale(
+                      scale: 1,
                       duration: const Duration(milliseconds: 300),
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        cart.items.length.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          cart.items.length.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     );
@@ -153,9 +157,9 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ---------------- LISTA DE PRODUTOS ----------------
+  // ================= PRODUTOS =================
 
-  SliverList _productsList() {
+  SliverList _buildProductsList() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
@@ -166,11 +170,11 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ---------------- BOTTOM BAR DO CARRINHO ----------------
+  // ================= BOTTOM CART =================
 
-  Widget _cartBottomBar() {
+  Widget _buildCartBottomBar(BuildContext context) {
     return Consumer<CartController>(
-      builder: (context, cart, _) {
+      builder: (_, cart, __) {
         if (cart.isEmpty) return const SizedBox();
 
         return Positioned(
@@ -178,9 +182,9 @@ class HomePage extends StatelessWidget {
           right: 16,
           bottom: 16,
           child: AnimatedSlide(
+            offset: Offset.zero,
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeOut,
-            offset: Offset.zero,
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -189,62 +193,62 @@ class HomePage extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     blurRadius: 20,
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withOpacity(0.25),
                   ),
                 ],
               ),
-             child:  Row(
-                    children: [
-                      /// TEXTOS
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${cart.items.length} itens',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'R\$ ${cart.total.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      /// BOTÃO
-                      SizedBox(
-                        height: 40,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppTheme.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
+              child: Row(
+                children: [
+                  /// TEXTOS
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${cart.items.length} itens',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CartPage(),
-                              ),
-                            );
-                          },
-                          child: const Text('Ver carrinho'),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'R\$ ${cart.total.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// BOTÃO
+                  SizedBox(
+                    height: 42,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppTheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                    ],
-                  )
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CartPage(),
+                          ),
+                        );
+                      },
+                      child: const Text('Ver carrinho'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
