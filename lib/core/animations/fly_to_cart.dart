@@ -1,28 +1,63 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-class FlyToCart extends StatefulWidget {
-  final Widget child;
+class FlyToCart {
+  static void animate({
+    required BuildContext context,
+    required GlobalKey cartKey,
+    required ImageProvider image,
+    required Offset startPosition,
+  }) {
+    final overlay = Overlay.of(context);
+    if (overlay == null) return;
+
+    final cartBox =
+        cartKey.currentContext?.findRenderObject() as RenderBox?;
+    if (cartBox == null) return;
+
+    final endPosition = cartBox.localToGlobal(
+      cartBox.size.center(Offset.zero),
+    );
+
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (_) {
+        return _FlyWidget(
+          start: startPosition,
+          end: endPosition,
+          image: image,
+          onFinish: () => entry.remove(),
+        );
+      },
+    );
+
+    overlay.insert(entry);
+  }
+}
+
+class _FlyWidget extends StatefulWidget {
   final Offset start;
   final Offset end;
-  final Duration duration;
+  final ImageProvider image;
+  final VoidCallback onFinish;
 
-  const FlyToCart({
-    super.key,
-    required this.child,
+  const _FlyWidget({
     required this.start,
     required this.end,
-    this.duration = const Duration(milliseconds: 700),
+    required this.image,
+    required this.onFinish,
   });
 
   @override
-  State<FlyToCart> createState() => _FlyToCartState();
+  State<_FlyWidget> createState() => _FlyWidgetState();
 }
 
-class _FlyToCartState extends State<FlyToCart>
+class _FlyWidgetState extends State<_FlyWidget>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<Offset> _position;
-  late final Animation<double> _scale;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -30,46 +65,47 @@ class _FlyToCartState extends State<FlyToCart>
 
     _controller = AnimationController(
       vsync: this,
-      duration: widget.duration,
+      duration: const Duration(milliseconds: 650),
     );
 
-    _position = Tween<Offset>(
-      begin: widget.start,
-      end: widget.end,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
-    );
+    _animation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
 
-    _scale = Tween<double>(
-      begin: 1,
-      end: 0.2,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-
-    _controller.forward();
+    _controller.forward().whenComplete(widget.onFinish);
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: _animation,
       builder: (_, __) {
+        final x = lerpDouble(
+          widget.start.dx,
+          widget.end.dx,
+          _animation.value,
+        )!;
+        final y = lerpDouble(
+          widget.start.dy,
+          widget.end.dy,
+          _animation.value,
+        )!;
+
         return Positioned(
-          left: _position.value.dx,
-          top: _position.value.dy,
+          left: x,
+          top: y,
           child: Transform.scale(
-            scale: _scale.value,
-            child: widget.child,
+            scale: 1 - _animation.value * 0.5,
+            child: Opacity(
+              opacity: 1 - _animation.value,
+              child: Image(
+                image: widget.image,
+                width: 48,
+                height: 48,
+              ),
+            ),
           ),
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }

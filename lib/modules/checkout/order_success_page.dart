@@ -41,7 +41,7 @@ class OrderSuccessPage extends StatelessWidget {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const HomePage(),
+                      builder: (_) => HomePage(),
                     ),
                     (_) => false,
                   );

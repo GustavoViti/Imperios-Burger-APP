@@ -80,7 +80,7 @@ class _RegisterPageState extends State<RegisterPage>
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const HomePage(),
+                        builder: (_) => HomePage(),
                       ),
                     );
                   },

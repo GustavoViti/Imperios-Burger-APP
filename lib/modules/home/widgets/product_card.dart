@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import '../../../core/animations/fly_to_cart.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../cart/cart_controller.dart';
 import '../models/product_model.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductModel product;
+  final GlobalKey cartKey;
 
   const ProductCard({
     super.key,
     required this.product,
+    required this.cartKey,
   });
+
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -20,19 +23,21 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   bool _pressed = false;
 
-  void _addToCart(BuildContext context) {
-    context.read<CartController>().add(widget.product);
+ void _addToCart(BuildContext context) {
+  final box = context.findRenderObject() as RenderBox;
+  final startPosition =
+      box.localToGlobal(box.size.center(Offset.zero));
 
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${widget.product.name} adicionado ao carrinho 🛒'),
-        duration: const Duration(milliseconds: 900),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
+  FlyToCart.animate(
+    context: context,
+    cartKey: widget.cartKey,
+    image: NetworkImage(widget.product.image),
+    startPosition: startPosition,
+  );
+
+  context.read<CartController>().add(widget.product);
+}
+
 
   @override
   Widget build(BuildContext context) {

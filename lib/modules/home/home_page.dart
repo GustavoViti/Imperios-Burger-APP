@@ -10,7 +10,9 @@ import 'widgets/category_widget.dart';
 import 'widgets/product_card.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
+
+  final GlobalKey cartIconKey = GlobalKey();
 
   List<ProductModel> get products => [
         ProductModel(
@@ -109,10 +111,9 @@ class HomePage extends StatelessWidget {
           child: Stack(
             children: [
               IconButton(
-                icon: const Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Colors.white,
-                ),
+  key: cartIconKey,
+  icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -163,7 +164,8 @@ class HomePage extends StatelessWidget {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          return ProductCard(product: products[index]);
+          return ProductCard( product: products[index],
+  cartKey: cartIconKey,);
         },
         childCount: products.length,
       ),
