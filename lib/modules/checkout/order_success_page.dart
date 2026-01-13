@@ -46,7 +46,7 @@ class OrderSuccessPage extends StatelessWidget {
                     (_) => false,
                   );
                 },
-                child: const Text('Voltar para Home'),
+                child: const Text('Voltar para tela inicial'),
               ),
             ],
           ),
