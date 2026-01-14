@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Burger Bros',
+        title: 'Imperios Burger',
         theme: AppTheme.lightTheme,
         home: const SplashPage(),
       ),
