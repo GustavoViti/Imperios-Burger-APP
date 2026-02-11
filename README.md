@@ -15,6 +15,7 @@ Projeto inspirado em apps de delivery como o iFood.
 - Home com UI premium
 - Animações suaves
 - Identidade visual definida
+- Recursos nativos Android
 
 ## 📱 Status do projeto
 🚧 Em desenvolvimento (frontend apenas)
