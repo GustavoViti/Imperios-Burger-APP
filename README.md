@@ -14,7 +14,7 @@ Projeto inspirado em apps de delivery como o iFood.
 - Tela de Cadastro
 - Home com UI premium
 - Animações suaves
-- Identidade visual definida
+- Identidade visual
 - Recursos nativos Android
 
 ## 📱 Status do projeto
