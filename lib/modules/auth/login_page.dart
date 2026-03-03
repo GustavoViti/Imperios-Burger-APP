@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage>
               Image.asset('assets/images/logo.png', height: 80),
               const SizedBox(height: 16),
               const Text(
-                'Imperios Burger',
+                'Imperios Delivery',
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 32),
